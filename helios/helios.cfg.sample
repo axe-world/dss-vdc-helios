@@ -1,0 +1,23 @@
+reload_values = 60;
+zone_id = 65534;
+debug = 7;
+kwl : 
+{
+  id = "EC300";
+  name = "Helios KWL";
+};
+sensor_values : 
+{
+  s0 : 
+  {
+    value_name = "internalTemperature";
+    sensor_type = 1;
+    sensor_usage = 1;
+  };
+  s1 : 
+  {
+    value_name = "internalHumidity";
+    sensor_type = 2;
+    sensor_usage = 1;
+  };
+};
