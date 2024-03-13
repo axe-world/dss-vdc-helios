@@ -9,8 +9,20 @@
 #include <digitalSTROM/dsuid.h>
 #include <dsvdc/dsvdc.h>
 
-#define MAX_SENSOR_VALUES 5
+#define MAX_SENSOR_VALUES 10
+#define MAX_SCENES 20
+#define MAX_MODBUS_VALUES 10
 
+typedef struct modbus_data {
+  int modbus_register;
+  int modbus_value;
+} modbus_data_t;
+
+typedef struct scene {
+  int dsId;
+  char *configured_modbus_data;
+  modbus_data_t modbus_data[MAX_MODBUS_VALUES];
+} scene_t;
 
 typedef struct sensor_value {
   bool is_active;
@@ -27,7 +39,9 @@ typedef struct helios_kwl {
   dsuid_t dsuid;
   char *id;
   char *name;
+  char *configured_scenes;
   sensor_value_t sensor_values[MAX_SENSOR_VALUES];
+  scene_t scenes[MAX_SCENES];
   uint16_t zoneID;
 } helios_kwl_t;
 
@@ -74,8 +88,9 @@ extern void vdc_callscene_cb(dsvdc_t *handle __attribute__((unused)), char **dsu
 extern void vdc_savescene_cb(dsvdc_t *handle __attribute__((unused)), char **dsuid, size_t n_dsuid, int32_t scene, int32_t *group, int32_t *zone_id, void *userdata);
 extern void vdc_request_generic_cb(dsvdc_t *handle __attribute__((unused)), char *dsuid, char *method_name, dsvdc_property_t *property, const dsvdc_property_t *properties,  void *userdata);
 
-int helios_profile_select(int profile);
-int helios_profile_intensive(int minutes);
+bool is_scene_configured(int scene);
+scene_t* get_scene_configuration(int scene);
+int helios_write_modbus_register(int modbus_register, int value);
 int helios_get_values();
 void push_sensor_data();
 void push_device_states();

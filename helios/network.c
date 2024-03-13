@@ -107,41 +107,60 @@ int decodeURIComponent (char *sSource, char *sDest) {
   return nLength;
 }
 
-int helios_profile_select(int profile) {
-  vdc_report(LOG_NOTICE, "activate Helios profile %d\n",profile);
-  
-  modbus_t *mb;
-  mb = modbus_new_rtu("/dev/ttyUSB0", 19200, 'E', 8, 1);
-        
-  if (mb == NULL) {
-    vdc_report(LOG_ERR, "Unable to allocate libmodbus context\n");
-    return -1;
-  }
-
-  modbus_set_debug(mb, TRUE);
-  
-  modbus_set_response_timeout(mb, 0,1000000);  
-
-  modbus_set_slave(mb, 1);  
-    
-  if (modbus_connect(mb) == -1) {
-    vdc_report(LOG_ERR, "Modbus connection failed: %s\n", modbus_strerror(errno));
-    modbus_free(mb);
-    return -1;
-  } 
-    
-  vdc_report(LOG_NOTICE, "modbus connected\n");
-  
-  modbus_write_register(mb,4609,profile);
-  
-  modbus_close(mb);
-  modbus_free(mb); 
-    
-  return 0;
+bool is_scene_configured(int scene) {
+  char scene_str[5];
+  sprintf(scene_str, "-%d-", scene);
+  if (strstr(helios.kwl.configured_scenes, scene_str) != NULL) {
+    return TRUE;
+  } else return FALSE;
 }
 
-int helios_profile_intensive(int minutes) {
-  vdc_report(LOG_NOTICE, "activate Helios intensive profile\n");
+scene_t* get_scene_configuration(int scene) {
+  scene_t* scene_data;
+  int v;
+  int i;
+  
+  scene_data = malloc(sizeof(scene_t));
+  if (!scene_data) {
+    return NULL;
+  }
+  memset(scene_data, 0, sizeof(scene_t));
+  
+  v = 0;
+  while (1) {
+    if (&helios.kwl.scenes[v] != NULL) {
+      if (helios.kwl.scenes[v].dsId == scene) {
+        i = 0;
+        while (1) {
+          if (helios.kwl.scenes[v].modbus_data[i].modbus_register != -1) {
+            printf("AXE %d\n", i); 
+            scene_data->modbus_data[i] = helios.kwl.scenes[v].modbus_data[i];
+            
+            i++;
+          } else {
+            while (i < MAX_MODBUS_VALUES) {
+              scene_data->modbus_data[i].modbus_register = -1;
+              scene_data->modbus_data[i].modbus_value = -1;
+              i++;
+            }        
+            break;
+          }
+        }
+        break;
+      }
+      
+      v++;
+    } else {
+      break;
+    }
+  }
+    
+  return scene_data;
+}
+
+
+int helios_write_modbus_register(int modbus_register, int value) {
+  vdc_report(LOG_NOTICE, "write modbus register %d = %d\n", modbus_register, value);
   
   modbus_t *mb;
   mb = modbus_new_rtu("/dev/ttyUSB0", 19200, 'E', 8, 1);
@@ -163,7 +182,7 @@ int helios_profile_intensive(int minutes) {
     
   vdc_report(LOG_NOTICE, "modbus connected\n");
   
-  modbus_write_register(mb,4612,minutes);
+  modbus_write_register(mb, modbus_register, value);
   
   modbus_close(mb);
   modbus_free(mb); 

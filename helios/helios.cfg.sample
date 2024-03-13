@@ -5,7 +5,58 @@ kwl :
 {
   id = "EC300";
   name = "Helios KWL";
-};
+  scenes : 
+  {
+    s0 :
+    {
+      dsId = 5;
+      modbus :
+      {
+        m0 :
+        {
+          register = 4609;
+          value = 0;
+        }
+      }
+    }
+    s1 :
+    {
+      dsId = 17;
+      modbus :
+      {
+        m0 :
+        {
+          register = 4609;
+          value = 1;
+        }
+      }
+    }
+    s2 :
+    {
+      dsId = 18;
+      modbus :
+      {
+        m0 :
+        {
+          register = 4612;
+          value = 10;
+        }
+      }
+    }
+    s3 :
+    {
+      dsId = 19;
+      modbus :
+      {
+        m0 :
+        {
+          register = 4612;
+          value = 0;
+        }
+      }
+    }
+  }
+}
 sensor_values : 
 {
   s0 : 

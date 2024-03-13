@@ -21,6 +21,7 @@ int read_config() {
   config_t config;
   struct stat statbuf;
   int i;
+  int j;
   char *sval;
   int ivalue;
 
@@ -95,6 +96,55 @@ int read_config() {
       break;
     }
   }
+  
+  helios.kwl.configured_scenes = strdup("-");
+  i = 0;
+  while(1) {
+    sprintf(path, "kwl.scenes.s%d", i);
+    if (i < MAX_SCENES && config_lookup(&config, path)) {
+      scene_t* value = &helios.kwl.scenes[i];
+      
+      sprintf(path, "kwl.scenes.s%d.dsId", i);
+      config_lookup_int(&config, path, &ivalue);
+      value->dsId = ivalue;
+      char str[4];
+      sprintf(str, "%d", ivalue);
+      helios.kwl.configured_scenes = realloc(helios.kwl.configured_scenes, strlen(helios.kwl.configured_scenes)+4);
+      strcat(helios.kwl.configured_scenes, str);
+      strcat(helios.kwl.configured_scenes, "-");
+    
+      j = 0;
+      while(1) {
+        sprintf(path, "kwl.scenes.s%d.modbus.m%d", i, j);  
+        if (j < MAX_MODBUS_VALUES && config_lookup(&config, path)) {
+          modbus_data_t* value = &helios.kwl.scenes[i].modbus_data[j];
+          
+          sprintf(path, "kwl.scenes.s%d.modbus.m%d.register", i, j);
+          if (config_lookup_int(&config, path, &ivalue)) value->modbus_register = ivalue;
+          
+          sprintf(path, "kwl.scenes.s%d.modbus.m%d.value", i, j);
+          if (config_lookup_int(&config, path, &ivalue)) value->modbus_value = ivalue;
+          
+          j++;
+        } else {
+          while (j < MAX_MODBUS_VALUES) {
+            helios.kwl.scenes[i].modbus_data[j].modbus_register = -1;
+            helios.kwl.scenes[i].modbus_data[j].modbus_value = -1;
+            j++;
+          }        
+          break;
+        }
+      }
+      
+      i++;
+    } else {
+      while (i < MAX_SCENES) {
+        helios.kwl.scenes[i].dsId = -1;
+        i++;
+      }        
+      break;
+    } 
+  } 
 
   if (g_cfgfile != NULL) {
     config_destroy(&config);
@@ -127,7 +177,9 @@ int write_config() {
   config_setting_t* cfg_root;
   config_setting_t* setting;
   config_setting_t* kwlsetting;
+  
   int i;
+  int j;
 
   config_init(&config);
   cfg_root = config_root_setting(&config);
@@ -179,6 +231,69 @@ int write_config() {
   config_setting_set_string(setting, helios.kwl.name);
   
   char path[128];
+  sprintf(path, "scenes");   
+  config_setting_t* scenes_path = config_setting_add(kwlsetting, path, CONFIG_TYPE_GROUP);
+  
+  if (scenes_path == NULL) {
+    scenes_path = config_setting_get_member(kwlsetting, path);
+  }
+
+  i = 0;
+  while(1) {
+    if (i < MAX_SCENES && helios.kwl.scenes[i].dsId != -1) {
+      scene_t* value = &helios.kwl.scenes[i];
+     
+      sprintf(path, "s%d", i);   
+      config_setting_t* v = config_setting_add(scenes_path, path, CONFIG_TYPE_GROUP);
+
+      if (v == NULL) {
+        v = config_setting_get_member(scenes_path, path);
+      }
+      
+      setting = config_setting_add(v, "dsId", CONFIG_TYPE_INT);
+      if (setting == NULL) {
+        setting = config_setting_get_member(v, "dsId");
+      }
+      config_setting_set_int(setting, value->dsId);
+
+      sprintf(path, "modbus");   
+      config_setting_t* modbus_path = config_setting_add(v, path, CONFIG_TYPE_GROUP);
+      j = 0;
+      while(1) {
+        if (i < MAX_MODBUS_VALUES && helios.kwl.scenes[i].modbus_data[j].modbus_register != -1) {
+          modbus_data_t* value = &helios.kwl.scenes[i].modbus_data[j];
+
+          
+          sprintf(path, "m%d", j);   
+          v = config_setting_add(modbus_path, path, CONFIG_TYPE_GROUP);
+          
+          if (v == NULL) {
+            v = config_setting_get_member(modbus_path, path);
+          }
+          
+          setting = config_setting_add(v, "register", CONFIG_TYPE_INT);
+          if (setting == NULL) {
+            setting = config_setting_get_member(v, "register");
+          }
+          config_setting_set_int(setting, value->modbus_register);
+          
+          setting = config_setting_add(v, "value", CONFIG_TYPE_INT);
+          if (setting == NULL) {
+            setting = config_setting_get_member(v, "value");
+          }
+          config_setting_set_int(setting, value->modbus_value);
+
+          j++;
+        } else {
+          break;
+        }
+      }
+      i++;
+    } else {
+      break;
+    }
+  }
+  
   sprintf(path, "sensor_values");   
   config_setting_t *sensor_values_path = config_setting_add(cfg_root, path, CONFIG_TYPE_GROUP);
 

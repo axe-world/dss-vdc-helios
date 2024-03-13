@@ -118,7 +118,7 @@ void vdc_request_generic_cb(dsvdc_t *handle __attribute__((unused)), char *dsuid
           break;
         }
                   
-        if(strcasecmp(id, "ActProfileHome") == 0) {
+/**        if(strcasecmp(id, "ActProfileHome") == 0) {
           vdc_report(LOG_DEBUG, "Exec select home profile");
           helios_profile_select(0);                     
         } else if(strcasecmp(id, "ActProfileAway") == 0) {
@@ -132,7 +132,7 @@ void vdc_request_generic_cb(dsvdc_t *handle __attribute__((unused)), char *dsuid
           helios_profile_intensive(65535);                         
         } else {
           vdc_report(LOG_NOTICE, "request_generic_cb: command = %s not implemented\n", id);
-        }
+        }**/
       }
     }      
   }
@@ -145,19 +145,23 @@ void vdc_savescene_cb(dsvdc_t *handle __attribute__((unused)), char **dsuid, siz
 }
   
 void vdc_callscene_cb(dsvdc_t *handle __attribute__((unused)), char **dsuid, size_t n_dsuid, int32_t scene, bool force, int32_t *group, int32_t *zone_id, void *userdata) {
-
-
   if (strcasecmp(kwl_device->dsuidstring, *dsuid) == 0) {
     vdc_report(LOG_NOTICE, "called scene: %d\n", scene);
+    
+    bool is_configured = is_scene_configured(scene);
+    if(is_configured) {
+      scene_t* scene_data = get_scene_configuration(scene);
 
-    if (scene == 5) {
-      helios_profile_select(0);
-    } else if (scene == 17) {
-      helios_profile_select(1);
-    } if (scene == 18) {
-      helios_profile_intensive(10);
-    } if (scene == 19) {
-      helios_profile_intensive(65535);
+      int i = 0;
+      while (1) {
+        if (scene_data->modbus_data[i].modbus_register != -1) {
+          helios_write_modbus_register(scene_data->modbus_data[i].modbus_register, scene_data->modbus_data[i].modbus_value);
+          
+          i++;
+        } else {
+          break;
+        }
+      }
     }
   }
 }
