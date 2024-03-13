@@ -10,9 +10,13 @@ Integration example in DigitalSTROM configurator:
 
 Known limitations:
 The modbus connection parameters are currently hardcoded, will be added to configuration file next time:
+
   serial port:  /dev/ttyUSB0
+  
   baud rate:  19200, 
+  
   parity:  'E'  (even)
+  
   stop bit:  1
 
   
