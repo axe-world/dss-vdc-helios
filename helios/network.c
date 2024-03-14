@@ -133,7 +133,6 @@ scene_t* get_scene_configuration(int scene) {
         i = 0;
         while (1) {
           if (helios.kwl.scenes[v].modbus_data[i].modbus_register != -1) {
-            printf("AXE %d\n", i); 
             scene_data->modbus_data[i] = helios.kwl.scenes[v].modbus_data[i];
             
             i++;
