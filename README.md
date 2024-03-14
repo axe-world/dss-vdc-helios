@@ -1,4 +1,4 @@
-This vDC for DigtalSTROM smarthome system provides a modbus interface for Helios KWL devices. Tested with Helios EC200/300 W, but probably also with other models which support Helios EasyControls3.
+This vDC for DigtalSTROM smarthome system provides a modbus RTU (NOT modbus TCP of older Helios Devices with EasyControls2 !!) interface for Helios KWL devices. Tested with Helios EC200/300 W, but probably also with other models which support Helios EasyControls3.
 The interaction between DigitalStrom system and this vDC is done bei calling scenes which are configured through a config file of the VDC. Additionally the vDC sends the value of the two Helios device internal sensors
 internalTemperature and internalHumidity to DigitalSTROM system. This is currently hardcoded.  In future versions I will add possibility to add more sensor values through the config file.
 
