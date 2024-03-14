@@ -13,10 +13,12 @@ zone_id   -> DigitalStrom zone id
 debug     -> Logging level for the vDC  - 7 debug / all messages  ; 0 nearly no messages;
 
 Section "kwl" contains the KWL device configuration:
-
-kwl : id -> some alphanumeric ID identifying the device (e.g. model). 
-             
-kwl : name -> Any name for your KWL device
+ id -> some alphanumeric ID identifying the device (e.g. model).              
+ name -> Any name for your KWL device
+ serial_port -> serial port name, depends on the USB port in which the waveshare modbus rtu USB stick is placed,  e.g. "/dev/ttyUSB0"
+ serial_baud -> serial baud rate, default for Helios devices is 19200
+ serial_parity -> serial parity, default for Helios devics is "E" for even (use "O" for odd or "N" for none)
+ serial_stopbit -> serial stop bit, default for Helios devices is 1
 
 kwl : scenes : s0 to s19 (current maximum is 20 scenes)
         dsId -> Id of the DigitalStrom scene ; Scene 1 is dsId = 5, Scene 2 is dsID = 17, Scene 3 is dsId = 18, Scene 4 is dsId = 19 (see table 1 below)

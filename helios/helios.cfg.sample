@@ -5,6 +5,10 @@ kwl :
 {
   id = "EC300";
   name = "Helios KWL";
+  serial_port = "/dev/ttyUSB0";
+  serial_baud = 19200;
+  serial_parity = "E";
+  serial_stopbit = 1;
   scenes : 
   {
     s0 :
@@ -71,4 +75,10 @@ sensor_values :
     sensor_type = 2;
     sensor_usage = 1;
   };
+  s2 : 
+  {
+    value_name = "fanSpeed";
+    sensor_type = 12;
+    sensor_usage = 1;
+  }
 };

@@ -494,39 +494,10 @@ void vdc_getprop_cb(dsvdc_t *handle, const char *dsuid, dsvdc_property_t *proper
     } else if (strcmp(name, "deviceStates") == 0) {
       
     } else if (strcmp(name, "deviceProperties") == 0) {
-/**      dsvdc_property_t *reply;
-      ret  = dsvdc_property_new(&reply);
-      if (ret != DSVDC_OK) {
-        vdc_report(LOG_ERR, "failed to allocate reply property for %s\n", name);
-        free(name);
-        continue;
-      }
-      
-      dsvdc_property_add_string(reply, "name", "Prop 1");
-      dsvdc_property_add_string(reply, "type", "Prop 1");
-
-      dsvdc_property_add_property(property, name, &reply); **/
       
     } else if (strcmp(name, "devicePropertyDescriptions") == 0) {
     
     } else if (strcmp(name, "customActions") == 0) {
-/**      vdc_report(LOG_ERR, "********************************************************************************************");
-      vdc_report(LOG_ERR, "********************************************************************************************");
-      vdc_report(LOG_ERR, "********************************************************************************************");
-      dsvdc_property_t *reply;
-      ret  = dsvdc_property_new(&reply);
-      if (ret != DSVDC_OK) {
-        vdc_report(LOG_ERR, "failed to allocate reply property for %s\n", name);
-        free(name);
-        continue;
-      }
-      
-      dsvdc_property_add_string(reply, "name", "custom.action");
-      dsvdc_property_add_string(reply, "action", "std.heat");
-      dsvdc_property_add_string(reply, "title", "A 1");
-      dsvdc_property_add_string(reply, "params", "{}");
-      
-      dsvdc_property_add_property(property, name, &reply); **/
 
     } else if (strcmp(name, "binaryInputDescriptions") == 0) {      
         

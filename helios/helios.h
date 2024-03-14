@@ -9,6 +9,8 @@
 #include <digitalSTROM/dsuid.h>
 #include <dsvdc/dsvdc.h>
 
+#include <modbus/modbus.h>
+
 #define MAX_SENSOR_VALUES 10
 #define MAX_SCENES 20
 #define MAX_MODBUS_VALUES 10
@@ -39,6 +41,10 @@ typedef struct helios_kwl {
   dsuid_t dsuid;
   char *id;
   char *name;
+  char *serial_port;
+  int serial_baud;
+  char serial_parity;
+  int serial_stopbit;
   char *configured_scenes;
   sensor_value_t sensor_values[MAX_SENSOR_VALUES];
   scene_t scenes[MAX_SCENES];
@@ -88,6 +94,7 @@ extern void vdc_callscene_cb(dsvdc_t *handle __attribute__((unused)), char **dsu
 extern void vdc_savescene_cb(dsvdc_t *handle __attribute__((unused)), char **dsuid, size_t n_dsuid, int32_t scene, int32_t *group, int32_t *zone_id, void *userdata);
 extern void vdc_request_generic_cb(dsvdc_t *handle __attribute__((unused)), char *dsuid, char *method_name, dsvdc_property_t *property, const dsvdc_property_t *properties,  void *userdata);
 
+modbus_t* connect_mbus();
 bool is_scene_configured(int scene);
 scene_t* get_scene_configuration(int scene);
 int helios_write_modbus_register(int modbus_register, int value);

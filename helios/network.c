@@ -162,12 +162,25 @@ scene_t* get_scene_configuration(int scene) {
 int helios_write_modbus_register(int modbus_register, int value) {
   vdc_report(LOG_NOTICE, "write modbus register %d = %d\n", modbus_register, value);
   
-  modbus_t *mb;
-  mb = modbus_new_rtu("/dev/ttyUSB0", 19200, 'E', 8, 1);
+  modbus_t *mb = connect_mbus();
+    
+  modbus_write_register(mb, modbus_register, value);
+  
+  modbus_close(mb);
+  modbus_free(mb); 
+    
+  return 0;
+}
+
+modbus_t* connect_mbus() {
+  vdc_report(LOG_NOTICE, "network: open modbus rtu serial port\n");
+
+  modbus_t *mb = NULL;
+  mb = modbus_new_rtu(helios.kwl.serial_port, helios.kwl.serial_baud, helios.kwl.serial_parity, 8, helios.kwl.serial_stopbit);
         
   if (mb == NULL) {
     vdc_report(LOG_ERR, "Unable to allocate libmodbus context\n");
-    return -1;
+    return mb;
   }
 
   modbus_set_debug(mb, TRUE);  
@@ -175,19 +188,14 @@ int helios_write_modbus_register(int modbus_register, int value) {
   modbus_set_slave(mb, 1);  
     
   if (modbus_connect(mb) == -1) {
-    vdc_report(LOG_ERR, "Modbus connection failed: %s\n", modbus_strerror(errno));
+    vdc_report(LOG_ERR, "modbus connection failed: %s\n", modbus_strerror(errno));
     modbus_free(mb);
-    return -1;
+    return mb;
   } 
-    
-  vdc_report(LOG_NOTICE, "modbus connected\n");
   
-  modbus_write_register(mb, modbus_register, value);
+  vdc_report(LOG_NOTICE, "modbus connected\n");  
   
-  modbus_close(mb);
-  modbus_free(mb); 
-    
-  return 0;
+  return mb;
 }
 
 int helios_get_values() { 
@@ -198,25 +206,8 @@ int helios_get_values() {
 
   vdc_report(LOG_NOTICE, "network: reading Helios KWL values\n");
 
-  modbus_t *mb;
-  mb = modbus_new_rtu("/dev/ttyUSB0", 19200, 'E', 8, 1);
-        
-  if (mb == NULL) {
-    vdc_report(LOG_ERR, "Unable to allocate libmodbus context\n");
-    return -1;
-  }
-
-  modbus_set_debug(mb, TRUE);  
-  modbus_set_response_timeout(mb, 0,1000000);  
-  modbus_set_slave(mb, 1);  
-    
-  if (modbus_connect(mb) == -1) {
-    vdc_report(LOG_ERR, "Modbus connection failed: %s\n", modbus_strerror(errno));
-    modbus_free(mb);
-    return -1;
-  } 
+  modbus_t *mb = connect_mbus();
   
-  vdc_report(LOG_NOTICE, "modbus connected\n");  
   uint16_t dest[1];
   
   modbus_read_registers(mb,4369,1,dest);  
@@ -242,6 +233,21 @@ int helios_get_values() {
     vdc_report(LOG_WARNING, "value internalHumidity is not configured for evaluation - ignoring\n");
   } else {
     vdc_report(LOG_WARNING, "network: get sensor value internalHumidity: %d\n", dest[0]);        
+    if ((svalue->last_reported == 0) || (svalue->last_value != dest[0])) {
+      changed_values = TRUE;
+    } 
+    svalue->last_value = svalue->value;
+    svalue->value = dest[0];
+    svalue->last_query = now;
+  }
+  
+  modbus_read_registers(mb,4353,1,dest);  
+  
+  svalue = find_sensor_value_by_name("fanSpeed");
+  if (svalue == NULL) {
+    vdc_report(LOG_WARNING, "value fanSpeed is not configured for evaluation - ignoring\n");
+  } else {
+    vdc_report(LOG_WARNING, "network: get sensor value fanSpeed: %d\n", dest[0]);        
     if ((svalue->last_reported == 0) || (svalue->last_value != dest[0])) {
       changed_values = TRUE;
     } 

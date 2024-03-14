@@ -24,6 +24,7 @@ int read_config() {
   int j;
   char *sval;
   int ivalue;
+  char cvalue;
 
   if (stat(g_cfgfile, &statbuf) != 0) {
     vdc_report(LOG_ERR, "Could not find configuration file %s\n", g_cfgfile);
@@ -60,6 +61,30 @@ int read_config() {
     helios.kwl.id = strdup(sval);
   } else {
     vdc_report(LOG_ERR, "mandatory parameter 'id' in section kwl: is not set in helios.cfg\n");  
+    exit(0);
+  }
+  if (config_lookup_string(&config, "kwl.serial_port", (const char **) &sval)) {
+    helios.kwl.serial_port = strdup(sval);
+  } else {
+    vdc_report(LOG_ERR, "mandatory parameter 'serial_port' in section kwl: is not set in helios.cfg\n");  
+    exit(0);
+  }
+  if (config_lookup_int(&config, "kwl.serial_baud", (int *) &ivalue)) {
+    helios.kwl.serial_baud = ivalue;
+  } else {
+    vdc_report(LOG_ERR, "mandatory parameter 'serial_baud' in section kwl: is not set in helios.cfg\n");  
+    exit(0);
+  }
+  if (config_lookup_string(&config, "kwl.serial_parity", (const char **) &sval)) {
+    helios.kwl.serial_parity = strdup(sval)[0];
+  } else {
+    vdc_report(LOG_ERR, "mandatory parameter 'serial_parity' in section kwl: is not set in helios.cfg\n");  
+    exit(0);
+  }
+  if (config_lookup_int(&config, "kwl.serial_stopbit", (int *) &ivalue)) {
+    helios.kwl.serial_stopbit = ivalue;
+  } else {
+    vdc_report(LOG_ERR, "mandatory parameter 'serial_stopbit' in section kwl: is not set in helios.cfg\n");  
     exit(0);
   }
  
@@ -229,6 +254,32 @@ int write_config() {
     setting = config_setting_get_member(kwlsetting, "name");
   }
   config_setting_set_string(setting, helios.kwl.name);
+  
+  setting = config_setting_add(kwlsetting, "serial_port", CONFIG_TYPE_STRING);
+  if (setting == NULL) {
+    setting = config_setting_get_member(kwlsetting, "serial_port");
+  }
+  config_setting_set_string(setting, helios.kwl.serial_port);
+  
+  setting = config_setting_add(kwlsetting, "serial_baud", CONFIG_TYPE_INT);
+  if (setting == NULL) {
+    setting = config_setting_get_member(kwlsetting, "serial_baud");
+  }
+  config_setting_set_int(setting, helios.kwl.serial_baud);
+  
+  setting = config_setting_add(kwlsetting, "serial_parity", CONFIG_TYPE_STRING);
+  if (setting == NULL) {
+    setting = config_setting_get_member(kwlsetting, "serial_parity");
+  }
+  char str[2];
+  strncat(str, &helios.kwl.serial_parity, 1);
+  config_setting_set_string(setting, str);
+    
+  setting = config_setting_add(kwlsetting, "serial_stopbit", CONFIG_TYPE_INT);
+  if (setting == NULL) {
+    setting = config_setting_get_member(kwlsetting, "serial_stopbit");
+  }
+  config_setting_set_int(setting, helios.kwl.serial_stopbit);
   
   char path[128];
   sprintf(path, "scenes");   
