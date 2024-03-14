@@ -329,13 +329,13 @@ void vdc_getprop_cb(dsvdc_t *handle, const char *dsuid, dsvdc_property_t *proper
       } else if (strcmp(name, "oemGuid") == 0) {
 
       } else if (strcmp(name, "implementationId") == 0) {
-        dsvdc_property_add_string(property, name, "Klafs Sauna");
+        dsvdc_property_add_string(property, name, "Helios KWL");
 
       } else if (strcmp(name, "modelUID") == 0) {
-        dsvdc_property_add_string(property, name, "Klafs Sauna");
+        dsvdc_property_add_string(property, name, "Helios KWL");
 
       } else if (strcmp(name, "modelGuid") == 0) {
-        dsvdc_property_add_string(property, name, "Klafs Sauna");
+        dsvdc_property_add_string(property, name, "Helios KWL");
 
       } else if (strcmp(name, "name") == 0) {
         char info[256];
@@ -693,7 +693,7 @@ void vdc_getprop_cb(dsvdc_t *handle, const char *dsuid, dsvdc_property_t *proper
 
     } else if (strcmp(name, "deviceIconName") == 0) {
       char info[256];
-      strcpy(info, "klafs-sauna-16.png");
+      strcpy(info, "helios-kwl-16.png");
       
       dsvdc_property_add_string(property, name, info);
 
