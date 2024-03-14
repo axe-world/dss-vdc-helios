@@ -21,7 +21,7 @@ Section "kwl" contains the KWL device configuration:
  serial_parity -> serial parity, default for Helios devics is "E" for even (use "O" for odd or "N" for none)
  serial_stopbit -> serial stop bit, default for Helios devices is 1
 
- Section scenes in section wkl contains the digitalSTROM scenes configuration:
+ Section scenes in section kwl contains the digitalSTROM scenes configuration:
  section s0 to s19 (current maximum is 20 scenes) in section scenes contains the digitalSTROM scenes configuration: 
         dsId = Id of the DigitalStrom scene ; Scene 1 is dsId = 5, Scene 2 is dsID = 17, Scene 3 is dsId = 18, Scene 4 is dsId = 19 (see table 1 below)
         section modbus in every scene section contains the modbus registers and values to be written on Helios device
@@ -66,7 +66,7 @@ internalHumidity              humidity of Helios KWL internal sensor            
 
 
 Sample of a valid helios.cfg file with useful settings, see file helios.cfg.sample
-This sample config configures DigitalStrom scenes 1-4 following:
+This sample config configures DigitalStrom scenes 1-4 as following:
   scene 1: activate "home" profile in KWL  (modbus register 4609 value 0)
   scene 2: activate "away" profile in KWL   (modbus register 4609 value 1)
   scene 3: activate "boost" profile for 10 minutes in KWL   (modbus register 4612 value 10)
