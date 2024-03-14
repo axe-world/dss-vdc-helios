@@ -8,16 +8,5 @@ Integration example in DigitalSTROM configurator:
  - create two new "scene responders" one reacting on userdefined state "CO2 high" and calling the scene of this vDC which is configured to execute the "home" or "boost" profile in the Helios device
   and one reacting on userdefined state "CO2 low" and calling the scene of this vDC which is configured to execute the "away" profile in the Helios device
 
-Known limitations:
-The modbus connection parameters are currently hardcoded, will be added to configuration file next time:
-
-  serial port:  /dev/ttyUSB0
-  
-  baud rate:  19200, 
-  
-  parity:  'E'  (even)
-  
-  stop bit:  1
-
-  
+ 
 See README for more details!
