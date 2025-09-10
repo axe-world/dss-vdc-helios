@@ -152,16 +152,21 @@ void vdc_callscene_cb(dsvdc_t *handle __attribute__((unused)), char **dsuid, siz
     if(is_configured) {
       scene_t* scene_data = get_scene_configuration(scene);
 
-      int i = 0;
-      while (1) {
-        if (scene_data->modbus_data[i].modbus_register != -1) {
-          helios_write_modbus_register(scene_data->modbus_data[i].modbus_register, scene_data->modbus_data[i].modbus_value);
+	  if (scene_data != NULL) {		
+      	int i = 0;
+      	while (1) {
+          if (scene_data->modbus_data[i].modbus_register != -1) {
+          	helios_write_modbus_register(scene_data->modbus_data[i].modbus_register, scene_data->modbus_data[i].modbus_value);
           
-          i++;
-        } else {
-          break;
-        }
-      }
+			i++;
+          } else {
+            break;
+          }
+	    }
+		free(scene_data);
+	  } else {
+        vdc_report(LOG_INFO, "memory allocation for scene data failed!");  		  
+	  }
     }
   }
 }
